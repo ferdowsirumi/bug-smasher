@@ -230,9 +230,9 @@ span.score {
 
 .section-gray {
     position: relative;
-background-image: url(img/macro3.jpg);
-    background-size: cover;
-    padding: 30px 0 70px 0;
+    /* background-image: url(img/macro3.jpg); */
+    /* background-size: cover; */
+    /* padding: 30px 0 70px 0; */
     width: 100%;
     height: auto;    
 }
@@ -280,7 +280,7 @@ background-image: url(img/macro3.jpg);
 
 @media screen and (max-width: 900px) {
     .section-gray {
-        padding: 55px 10px 55px 10px;
+        /* padding: 55px 10px 55px 10px; */
         width: 100%;
     }
     .main-services {

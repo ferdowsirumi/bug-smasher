@@ -3,34 +3,170 @@
 
 window.addEventListener("load", setUpPage, false);
 
+var canvas = document.createElement('canvas');
+div = document.getElementById("divGameStage");
+canvas.id = "CursorLayer";
+// canvas.width  = 100;
+// canvas.height = 100;
+canvas.style.width = '100%';
+canvas.style.height = '100%';
+
+canvas.style.zIndex = 8;
+//canvas.style.position = "absolute";
+canvas.style.border = "1px solid red";
+div.appendChild(canvas);
+
+var ctx = canvas.getContext("2d");
+
+var clickX = -1;
+var clickY = -1;
+
 
 function setUpPage() {
-    // createInputFieldsEventListener();
-    // createRegisterAccountEventListener();
-    // createClearFormEventListener();
-    // setUpFormData();
-    moveBugByInterval();
+    if(div)
+    canvasAddEventListener();
+}
+// function loadImages() {
+// Background image
+var bgReady = false;
+var bgImage = new Image();
+bgImage.onload = function () {
+
+    bgReady = true;
+   // drawImageActualSize();
+};
+// bgImage.width = canvas.width;
+bgImage.src = "img/macro3.jpg";
+
+// bug image
+var bugReady = false;
+var bugImage = new Image();
+bugImage.onload = function () {
+    bugReady = true;
+};
+bugImage.src = "img/beetle.png";
+
+var bug = {
+    x: 20,
+    y: 20
+};
+var bugSmashed = 0;
+// Reset the game when the player smashes the bug
+var reset = function () {
+    // bug.x = canvas.width / 2;
+    // bug.y = canvas.height / 2;
+
+    // Throw the monster somewhere on the screen randomly
+    clickX = -1;
+    clickY = -1;
+    bug.x = 32 + (Math.random() * (canvas.width - 64));
+    bug.y = 32 + (Math.random() * (canvas.height - 64));
+};
+
+// Handle keyboard controls
+var keysDown = {};
+
+
+// Draw everything
+var render = function () {
+    // canvas.width = this.naturalWidth;
+    // canvas.height = this.naturalHeight;
+    if(bgReady)
+    {
+       // drawImage(bgImage);
+       // bgImage.onload = drawImageActualSize();
+       ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height,0,0, canvas.width, canvas.height);
+    }
+
+    if (bugReady) {
+        ctx.drawImage(bugImage, bug.x, bug.y, 50, 50);
+    }
+    // Score
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.font = "11px Helvetica";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("Bug Smashed: " + bugSmashed, 0, 5);
+};
+
+ 
+
+// The main game loop
+var main = function () {
+    var now = Date.now();
+    var delta = now - then;
+
+    update(delta / 5000);
+    render();
+
+    then = now;
+
+    // Request to do this again ASAP
+    requestAnimationFrame(main);
+};
+
+
+
+// Update game objects
+var update = function (modifier) {
+
+    // Are they touching?
+    console.log("x,y", bug.x, bug.y, clickX, clickY);
+    //console.log("cx,cy", );
+
+    if (
+        bug.x <= (clickX + 32) &&
+        bug.x >= (clickX-32)&&
+        bug.y >=(clickY-32)
+        && bug.y <= (clickY + 32)
+    ) {
+        ++bugSmashed;
+        reset();
+    }
+};
+
+function mouseClickHandler(event) {
+    var x = event.offsetX;
+    var y = event.offsetY;
+    clickX = x;
+    clickY = y;
+    console.log("x coords: " + clickX + ", y coords: " + clickY);
 }
 
-function moveBugByInterval() {
-    // let date = new Date();
-    // let time = date.toLocaleTimeString();
-  var divBug =  document.getElementById('divBug');
-    
-    divBug.style.left = Math.floor((Math.random() * 100) + 1).toString() + "%";;
-    divBug.style.top = Math.floor((Math.random() * 100) + 1).toString() + "%";
-    console.log("bug displaced:", divBug.style.top);
 
-    //.textContent = time;
- }
+function canvasAddEventListener() {
+    var canvas = document.getElementById("CursorLayer");
+    if (canvas.addEventListener) {
+        canvas.addEventListener("click", mouseClickHandler, false);
+    } else if (canvas.attachEvent) {
+        canvas.attachEvent("onclick", mouseClickHandler);
+    }
+}
 
-//  function getRandomPosition() {
-//     var x = document.getElementById("demo")
-//     x.innerHTML = Math.floor((Math.random() * 100) + 1);
-//   }
- 
- const createClock = setInterval(moveBugByInterval, 1000);
 
+// Cross-browser support for requestAnimationFrame
+var w = window;
+requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+
+// Let's play this game!
+var then = Date.now();
+reset();
+main();
+
+
+// function moveBugByInterval() {
+//     // let date = new Date();
+//     // let time = date.toLocaleTimeString();
+//     var divBug = document.getElementById('divBug');
+
+//     divBug.style.left = Math.floor((Math.random() * 100) + 1).toString() + "%";;
+//     divBug.style.top = Math.floor((Math.random() * 100) + 1).toString() + "%";
+//     console.log("bug displaced:", divBug.style.top);
+
+//     //.textContent = time;
+// }
+
+//const createClock = setInterval(moveBugByInterval, 1000);
 
 
 
