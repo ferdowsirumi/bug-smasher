@@ -230,13 +230,10 @@ span.score {
 
 .section-gray {
     position: relative;
-    /* background-image: url(img/macro3.jpg); */
-    /* background-size: cover; */
-    /* padding: 30px 0 70px 0; */
     width: 80%;
     text-align: center;
     margin:auto; 
-    max-height: 620px;
+    height: 620px;
 }
 
 .section-tittle {
@@ -283,9 +280,7 @@ span.score {
 @media screen and (max-width: 900px) {
     .section-gray {
         width: 100%;
-        max-height: auto;
-        height: auto;
-
+        max-height: 620px;
     }
     .main-services {
         width: 100%;
