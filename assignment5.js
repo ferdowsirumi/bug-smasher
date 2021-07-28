@@ -1,15 +1,22 @@
 // author: Ferdowsi Rumi 301168815
 // assignment 5: Bug Smasher
 
-window.addEventListener("load", setUpPage, false);
+//window.addEventListener("load", setUpPage, false);
 
 var canvas = document.createElement('canvas');
 div = document.getElementById("divGameStage");
+var scoreSpan = document.getElementById("score");
+var bugSmashed = 0;
+
+scoreSpan.innerHTML = bugSmashed;
 canvas.id = "CursorLayer";
-// canvas.width  = 100;
-// canvas.height = 100;
-canvas.style.width = '100%';
-canvas.style.height = '100%';
+const win = {
+    w: div.innerWidth,
+    h: div.innerHeight
+}
+const bgImage = new Image();
+const bugImage = new Image();
+bugImage.style.border = "1px solid red";
 
 canvas.style.zIndex = 8;
 //canvas.style.position = "absolute";
@@ -18,39 +25,127 @@ div.appendChild(canvas);
 
 var ctx = canvas.getContext("2d");
 
-var clickX = -1;
-var clickY = -1;
-
-
-function setUpPage() {
-    if(div)
-    canvasAddEventListener();
+/*--------------------
+Cover Image
+--------------------*/
+const coverImg = (bgImage, type = 'cover') => {
+    const imgRatio = bgImage.height / bgImage.width;
+    const winRatio = window.innerHeight / window.innerWidth;
+    if ((imgRatio < winRatio && type === 'contain') || (imgRatio > winRatio && type === 'cover')) {
+        const h = window.innerWidth * imgRatio;
+        ctx.drawImage(bgImage, 0, (window.innerHeight - h) / 2, window.innerWidth, h);
+    }
+    if ((imgRatio > winRatio && type === 'contain') || (imgRatio < winRatio && type === 'cover')) {
+        const w = window.innerWidth * winRatio / imgRatio;
+        ctx.drawImage(bgImage, (win.w - w) / 2, 0, w, window.innerHeight);
+    }
 }
-// function loadImages() {
-// Background image
-var bgReady = false;
-var bgImage = new Image();
-bgImage.onload = function () {
-
-    bgReady = true;
-   // drawImageActualSize();
-};
-// bgImage.width = canvas.width;
-bgImage.src = "img/macro3.jpg";
 
 // bug image
 var bugReady = false;
-var bugImage = new Image();
+
+const bugImgSrc = 'img/bug.png';
+//bugImage.onload = init;
 bugImage.onload = function () {
     bugReady = true;
 };
-bugImage.src = "img/beetle.png";
-
+bugImage.src = bugImgSrc;
 var bug = {
-    x: 20,
-    y: 20
+    // x: 32 + (Math.random() * (canvas.width - 64)),
+    // y: 32 + (Math.random() * (canvas.height - 64))
+    x: Math.floor(60 + (Math.random() * (canvas.width - 100))),
+    y: Math.floor((Math.random() * (canvas.height - 100)))
 };
-var bugSmashed = 0;
+var fps = 10;
+var timer = 0;
+/*--------------------
+Resize
+--------------------*/
+const resize = () => {
+    win.w = window.innerWidth;
+    win.h = window.innerHeight;
+    canvas.width = win.w;
+    canvas.height = win.h;
+    canvas.style.width = `${win.w - 20}px`;
+    canvas.style.height = `${win.h}px`;
+}
+
+/*--------------------
+Render
+--------------------*/
+const render = () => {
+    ctx.clearRect(0, 0, win.w, win.h);
+    // const type = document.querySelector('input[name="type"]:checked').value
+    coverImg(bgImage, 'cover');
+
+    if (bugReady) {
+        ctx.drawImage(bugImage, bug.x, bug.y, 55, 55);
+    }
+    // Score
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.font = "11px Helvetica";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("Bug Smashed: " + bugSmashed, 0, 5);
+    requestAnimationFrame(render);
+}
+
+/*--------------------
+Init
+--------------------*/
+const init = () => {
+    resize();
+    render();
+    timer = setInterval(reset, 30000 / fps);
+    reset();
+    // canvasAddEventListener();
+}
+
+
+/*--------------------
+Preload Image
+--------------------*/
+const imgSrc = "img/macro3.jpg";
+bgImage.onload = init;
+bgImage.src = imgSrc;
+
+window.addEventListener('resize', init);
+// Update game objects
+var update = function (modifier) {
+
+    // Are they touching?
+    // console.log("x,y", bug.x, bug.y, clickX, clickY);
+    //console.log("cx,cy", );
+
+    if (
+        Math.abs(bug.x - clickX) <= 60 &&
+        Math.abs(bug.y - clickY) <= 60
+    ) {
+        console.log("bug smashed", bugSmashed), scoreSpan;
+        ++bugSmashed;
+        scoreSpan.innerHtml = bugSmashed;
+        reset;
+    }
+};
+
+// The main game loop
+var main = function () {
+    var now = Date.now();
+    var delta = now - then;
+
+    //  update(delta /999999999);
+    init;
+
+    then = now;
+
+    // Request to do this again ASAP
+    requestAnimationFrame(main);
+};
+
+// var canvasOffsetX = 190;
+
+// var canvasOffsetY = 66;
+
 // Reset the game when the player smashes the bug
 var reset = function () {
     // bug.x = canvas.width / 2;
@@ -59,99 +154,170 @@ var reset = function () {
     // Throw the monster somewhere on the screen randomly
     clickX = -1;
     clickY = -1;
-    bug.x = 32 + (Math.random() * (canvas.width - 64));
-    bug.y = 32 + (Math.random() * (canvas.height - 64));
-};
 
-// Handle keyboard controls
-var keysDown = {};
-
-
-// Draw everything
-var render = function () {
-    // canvas.width = this.naturalWidth;
-    // canvas.height = this.naturalHeight;
-    if(bgReady)
-    {
-       // drawImage(bgImage);
-       // bgImage.onload = drawImageActualSize();
-       ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height,0,0, canvas.width, canvas.height);
-    }
+    bug.x = Math.floor(60 + (Math.random() * (canvas.width - 100)));
+    bug.y = Math.floor((Math.random() * (canvas.height - 100)))
 
     if (bugReady) {
-        ctx.drawImage(bugImage, bug.x, bug.y, 50, 50);
-    }
-    // Score
-    ctx.fillStyle = "rgb(255, 255, 255)";
-    ctx.font = "11px Helvetica";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    ctx.fillText("Bug Smashed: " + bugSmashed, 0, 5);
-};
-
- 
-
-// The main game loop
-var main = function () {
-    var now = Date.now();
-    var delta = now - then;
-
-    update(delta / 5000);
-    render();
-
-    then = now;
-
-    // Request to do this again ASAP
-    requestAnimationFrame(main);
-};
-
-
-
-// Update game objects
-var update = function (modifier) {
-
-    // Are they touching?
-    console.log("x,y", bug.x, bug.y, clickX, clickY);
-    //console.log("cx,cy", );
-
-    if (
-        bug.x <= (clickX + 32) &&
-        bug.x >= (clickX-32)&&
-        bug.y >=(clickY-32)
-        && bug.y <= (clickY + 32)
-    ) {
-        ++bugSmashed;
-        reset();
+        render();
+        ctx.drawImage(bugImage, bug.x, bug.y, 60, 60);
     }
 };
-
-function mouseClickHandler(event) {
-    var x = event.offsetX;
-    var y = event.offsetY;
-    clickX = x;
-    clickY = y;
-    console.log("x coords: " + clickX + ", y coords: " + clickY);
-}
-
-
-function canvasAddEventListener() {
-    var canvas = document.getElementById("CursorLayer");
-    if (canvas.addEventListener) {
-        canvas.addEventListener("click", mouseClickHandler, false);
-    } else if (canvas.attachEvent) {
-        canvas.attachEvent("onclick", mouseClickHandler);
-    }
-}
-
 
 // Cross-browser support for requestAnimationFrame
 var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
-// Let's play this game!
-var then = Date.now();
-reset();
-main();
+
+function canvasAddEventListener() {
+    var canvas = document.getElementById("CursorLayer");
+    if (canvas.addEventListener) {
+        canvas.addEventListener("click", onMouseDown, false);
+    } else if (canvas.attachEvent) {
+        canvas.attachEvent("onclick", onMouseDown);
+    }
+}
+
+//mousedown event
+//var canvas = document.getElementById("CursorLayer");
+if (canvas.addEventListener) {
+    canvas.addEventListener("click", onMouseClick, false);
+} else if (canvas.attachEvent) {
+    canvas.attachEvent("onclick", onMouseClick);
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}
+
+function onMouseClick(event) {
+
+    console.log(canvas.x, canvas.y);
+
+    // if (e.button != 0) return;
+    //console.log("E", event);
+    var mouseXinCanvas = getMousePos(canvas, event).x;
+    var mouseYinCanvas = getMousePos(canvas, event).y
+
+    if (isBugSmashed(bug, mouseXinCanvas, mouseYinCanvas)) {
+        caught = true;
+        clearInterval(timer);
+        timer = setInterval(reset, 30000 / fps);
+        reset();
+        // render();
+    }
+    if (ResetScore(mouseXinCanvas, mouseYinCanvas)) {
+        location.reload();
+    }
+    if (ResetSpeed(mouseXinCanvas, mouseYinCanvas)) {
+        clearInterval(timer);
+        timer = setInterval(reset, 30000 / fps);
+        reset();
+        render();
+    }
+};
+
+//check if the bug is smashed
+function isBugSmashed(bug, clickX, clickY) {
+    console.log("BUG:", bug, clickX, clickY);
+
+    if (
+        Math.abs(bug.x + 20 - clickX) <= 40 &&
+        Math.abs(bug.y + 20 - clickY) <= 40
+    ) {
+        console.log("bug smashed");
+        ++bugSmashed;
+        console.log("bug smashed", bugSmashed), scoreSpan;
+        scoreSpan.innerText = bugSmashed;
+        fps = fps + 5;
+        return true;
+    }
+    return false;
+};
+
+//Reset Score box
+function ResetScore(x, y) {
+
+    if (x > (305)
+        && x < (545)
+        && y > (15)
+        && y < (85)
+    ) {
+        return true;
+    }
+    return false;
+};
+
+//Reset speed box
+function ResetSpeed(x, y) {
+    if (x > (605)
+        && x < (845)
+        && y > (15)
+        && y < (85)
+    ) {
+        fps = 10;
+        return true;
+    }
+    return false;
+};
+console.log('Bug smashed: ', bugSmashed);
+
+// function setUpPage() {
+//     if (div)
+//         canvasAddEventListener();
+// }
+// // function loadImages() {
+// // Background image
+// var bgReady = false;
+// var bgImage = new Image();
+// bgImage.onload = function () {
+
+//     bgReady = true;
+//     // drawImageActualSize();
+// };
+// // bgImage.width = canvas.width;
+// bgImage.src = "img/macro3.jpg";
+
+// // bug image
+// var bugReady = false;
+// var bugImage = new Image();
+// bugImage.onload = function () {
+//     bugReady = true;
+// };
+// bugImage.src = "img/beetle.png";
+
+
+// // Handle keyboard controls
+// var keysDown = {};
+
+
+// // Draw everything
+// var render = function () {
+//     // canvas.width = this.naturalWidth;
+//     // canvas.height = this.naturalHeight;
+//     if (bgReady) {
+//         // drawImage(bgImage);
+//         // bgImage.onload = drawImageActualSize();
+//         ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height, 0, 0, canvas.width, canvas.height);
+//     }
+
+//     if (bugReady) {
+//         ctx.drawImage(bugImage, bug.x, bug.y, 50, 50);
+//     }
+//     // Score
+//     ctx.fillStyle = "rgb(255, 255, 255)";
+//     ctx.font = "11px Helvetica";
+//     ctx.textAlign = "left";
+//     ctx.textBaseline = "top";
+//     ctx.fillText("Bug Smashed: " + bugSmashed, 0, 5);
+// };
+
+
+
 
 
 // function moveBugByInterval() {
