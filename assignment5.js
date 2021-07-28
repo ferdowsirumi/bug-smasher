@@ -1,29 +1,46 @@
 // author: Ferdowsi Rumi 301168815
 // assignment 5: Bug Smasher
+var bugSmashed = 0;
+var scoreSpan;
+window.addEventListener("load", setUpPage, false);
+function setUpPage() {
+    canvasAddEventListener();
+    scoreSpan = document.getElementById("score");
+    scoreSpan.innerHTML = "0";
+}
 
-//window.addEventListener("load", setUpPage, false);
 
 var canvas = document.createElement('canvas');
-div = document.getElementById("divGameStage");
-var scoreSpan = document.getElementById("score");
-var bugSmashed = 0;
+canvas.id = "bugSmasherCanvas";
+canvas.style.zIndex = 8;
+var ctx = canvas.getContext("2d");
 
-scoreSpan.innerHTML = bugSmashed;
-canvas.id = "CursorLayer";
+
+
+var divGameStage = document.getElementById("divGameStage");
+divGameStage.appendChild(canvas);
+
 const win = {
-    w: div.innerWidth,
-    h: div.innerHeight
+    w: canvas.innerWidth,
+    h: canvas.innerHeight
 }
 const bgImage = new Image();
 const bugImage = new Image();
-bugImage.style.border = "1px solid red";
+// bug image
+var bugReady = false;
 
-canvas.style.zIndex = 8;
-//canvas.style.position = "absolute";
-canvas.style.border = "1px solid red";
-div.appendChild(canvas);
+const bugImgSrc = 'img/bug.png';
+bugImage.onload = function () {
+    bugReady = true;
+};
+bugImage.src = bugImgSrc;
+var bug = {
+    x: Math.floor(60 + (Math.random() * (canvas.width - 100))),
+    y: Math.floor((Math.random() * (canvas.height - 100)))
+};
+var fps = 5;
+var timer = 0;
 
-var ctx = canvas.getContext("2d");
 
 /*--------------------
 Cover Image
@@ -41,23 +58,7 @@ const coverImg = (bgImage, type = 'cover') => {
     }
 }
 
-// bug image
-var bugReady = false;
 
-const bugImgSrc = 'img/bug.png';
-//bugImage.onload = init;
-bugImage.onload = function () {
-    bugReady = true;
-};
-bugImage.src = bugImgSrc;
-var bug = {
-    // x: 32 + (Math.random() * (canvas.width - 64)),
-    // y: 32 + (Math.random() * (canvas.height - 64))
-    x: Math.floor(60 + (Math.random() * (canvas.width - 100))),
-    y: Math.floor((Math.random() * (canvas.height - 100)))
-};
-var fps = 10;
-var timer = 0;
 /*--------------------
 Resize
 --------------------*/
@@ -69,6 +70,7 @@ const resize = () => {
     canvas.style.width = `${win.w - 20}px`;
     canvas.style.height = `${win.h}px`;
 }
+
 
 /*--------------------
 Render
@@ -83,7 +85,7 @@ const render = () => {
     }
     // Score
     ctx.fillStyle = "rgb(255, 255, 255)";
-    ctx.font = "11px Helvetica";
+    ctx.font = "16px Helvetica";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText("Bug Smashed: " + bugSmashed, 0, 5);
@@ -142,19 +144,10 @@ var main = function () {
     requestAnimationFrame(main);
 };
 
-// var canvasOffsetX = 190;
-
-// var canvasOffsetY = 66;
-
 // Reset the game when the player smashes the bug
 var reset = function () {
     // bug.x = canvas.width / 2;
     // bug.y = canvas.height / 2;
-
-    // Throw the monster somewhere on the screen randomly
-    clickX = -1;
-    clickY = -1;
-
     bug.x = Math.floor(60 + (Math.random() * (canvas.width - 100)));
     bug.y = Math.floor((Math.random() * (canvas.height - 100)))
 
@@ -170,21 +163,17 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 
 function canvasAddEventListener() {
-    var canvas = document.getElementById("CursorLayer");
+    var canvas = document.getElementById("bugSmasherCanvas");
     if (canvas.addEventListener) {
-        canvas.addEventListener("click", onMouseDown, false);
+        canvas.addEventListener("mousedown", onMouseClick, false);
     } else if (canvas.attachEvent) {
-        canvas.attachEvent("onclick", onMouseDown);
+        canvas.attachEvent("onmousedown", onMouseClick);
     }
 }
 
 //mousedown event
-//var canvas = document.getElementById("CursorLayer");
-if (canvas.addEventListener) {
-    canvas.addEventListener("click", onMouseClick, false);
-} else if (canvas.attachEvent) {
-    canvas.attachEvent("onclick", onMouseClick);
-}
+//var canvas = document.getElementById("bugSmasherCanvas");
+
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -195,11 +184,8 @@ function getMousePos(canvas, evt) {
 }
 
 function onMouseClick(event) {
+    if (event.button != 0) return;
 
-    console.log(canvas.x, canvas.y);
-
-    // if (e.button != 0) return;
-    //console.log("E", event);
     var mouseXinCanvas = getMousePos(canvas, event).x;
     var mouseYinCanvas = getMousePos(canvas, event).y
 
@@ -226,14 +212,14 @@ function isBugSmashed(bug, clickX, clickY) {
     console.log("BUG:", bug, clickX, clickY);
 
     if (
-        Math.abs(bug.x + 20 - clickX) <= 40 &&
-        Math.abs(bug.y + 20 - clickY) <= 40
+        Math.abs(bug.x - clickX) <= 60 &&
+        Math.abs(bug.y - clickY) <= 60
     ) {
         console.log("bug smashed");
         ++bugSmashed;
         console.log("bug smashed", bugSmashed), scoreSpan;
         scoreSpan.innerText = bugSmashed;
-        fps = fps + 5;
+        fps = fps + 2;
         return true;
     }
     return false;
