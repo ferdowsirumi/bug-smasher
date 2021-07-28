@@ -233,8 +233,7 @@ span.score {
     /* background-image: url(img/macro3.jpg); */
     /* background-size: cover; */
     /* padding: 30px 0 70px 0; */
-    width: 60%;
-    height: auto;   
+    width: 100%;
     text-align: center;
     margin:auto; 
 }
