@@ -233,9 +233,10 @@ span.score {
     /* background-image: url(img/macro3.jpg); */
     /* background-size: cover; */
     /* padding: 30px 0 70px 0; */
-    width: 100%;
+    width: 80%;
     text-align: center;
     margin:auto; 
+    max-height: 620px;
 }
 
 .section-tittle {
@@ -281,8 +282,10 @@ span.score {
 
 @media screen and (max-width: 900px) {
     .section-gray {
-        /* padding: 55px 10px 55px 10px; */
         width: 100%;
+        max-height: auto;
+        height: auto;
+
     }
     .main-services {
         width: 100%;
@@ -318,6 +321,11 @@ span.score {
     text-align: left;
     font: bold 16px sans-serif;
     padding: 55px 50px;
+    margin-top: 100px;
+    color: white;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 50px;
 }
 
 .footer-distributed .footer-left,
@@ -348,13 +356,6 @@ span.score {
     font-weight: 400;
     text-decoration: none;
     color: inherit;
-}
-
-.footer-distributed {
-    color: white;
-    font-size: 14px;
-    font-weight: normal;
-    margin-top: 0;
 }
 
 

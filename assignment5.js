@@ -23,8 +23,8 @@ var divGameStage = document.getElementById("divGameStage");
 divGameStage.appendChild(canvas);
 
 const win = {
-    w: canvas.innerWidth,
-    h: canvas.innerHeight
+    w: 500,
+    h: 500
 }
 console.log(win);
 const bgImage = new Image();
@@ -38,8 +38,8 @@ bugImage.onload = function () {
 };
 bugImage.src = bugImgSrc;
 var bug = {
-    x: Math.floor(60 + (Math.random() * (canvas.width - 100))),
-    y: Math.floor((Math.random() * (400)))
+    x : Math.floor(20 + (Math.random() * (divGameStage.getBoundingClientRect().width - 100))),
+    y : Math.floor((Math.random() * (550)))
 };
 var fps = 5;
 var timer = 0;
@@ -68,12 +68,14 @@ bgImage.src = imgSrc;
 Resize
 --------------------*/
 const resize = () => {
+    ctx.save();
     win.w = window.innerWidth;
     win.h = window.innerHeight;
     canvas.width = win.w;
     canvas.height = win.h;
     canvas.style.width = `${win.w - 20}px`;
     canvas.style.height = `${win.h}px`;
+    requestAnimationFrame(render);
 }
 
 
@@ -100,44 +102,44 @@ const render = () => {
 
 
 window.addEventListener('resize', init);
-// Update game objects
-var update = function (modifier) {
+// // Update game objects
+// var update = function (modifier) {
 
-    // Is bug inside?
-    // console.log("x,y", bug.x, bug.y, clickX, clickY);
-    //console.log("cx,cy", );
+//     // Is bug inside?
+//     // console.log("x,y", bug.x, bug.y, clickX, clickY);
+//     //console.log("cx,cy", );
 
-    if (
-        Math.abs(bug.x - clickX) <= 60 &&
-        Math.abs(bug.y - clickY) <= 60
-    ) {
-        console.log("bug smashed", bugSmashed), scoreSpan;
-        ++bugSmashed;
-        scoreSpan.innerHtml = bugSmashed;
-        reset;
-    }
-};
+//     if (
+//         Math.abs(bug.x - clickX) <= 60 &&
+//         Math.abs(bug.y - clickY) <= 60
+//     ) {
+//         console.log("bug smashed", bugSmashed), scoreSpan;
+//         ++bugSmashed;
+//         scoreSpan.innerHtml = bugSmashed;
+//         reset();
+//     }
+// };
 
-// The main game loop
-var main = function () {
-    var now = Date.now();
-    var delta = now - then;
+// // The main game loop
+// var main = function () {
+//     var now = Date.now();
+//     var delta = now - then;
 
-    //  update(delta /999999999);
-    init;
+//     //  update(delta /999999999);
+//     init();
 
-    then = now;
+//     then = now;
 
-    // Request to do this again ASAP
-    requestAnimationFrame(main);
-};
+//     // Request to do this again ASAP
+//     requestAnimationFrame(main);
+// };
 
 // Reset the game when the player smashes the bug
 var reset = function () {
     // bug.x = canvas.width / 2;
     // bug.y = canvas.height / 2;
-    bug.x = Math.floor(60 + (Math.random() * (canvas.width - 100)));
-    bug.y = Math.floor((Math.random() * (450)))
+    bug.x = Math.floor(20 + (Math.random() * (divGameStage.getBoundingClientRect().width - 100)));
+    bug.y = Math.floor((Math.random() * (550)))
 
     if (bugReady) {
         render();
@@ -228,6 +230,8 @@ const coverImg = (bgImage, type = 'cover') => {
     }
     if ((imgRatio > winRatio && type === 'contain') || (imgRatio < winRatio && type === 'cover')) {
         const w = window.innerWidth * winRatio / imgRatio;
-        ctx.drawImage(bgImage, (win.w - w) / 2, 0, w, window.innerHeight);
+        ctx.drawImage(bgImage, 0, 0, divGameStage.getBoundingClientRect().width, 600);
+
+       // ctx.drawImage(bgImage, (win.w - w) / 2, 0, w, window.innerHeight);
     }
 }
