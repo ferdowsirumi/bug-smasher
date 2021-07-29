@@ -14,7 +14,7 @@ function setUpPage() {
 
 var canvas = document.createElement('canvas');
 canvas.id = "bugSmasherCanvas";
-canvas.style.zIndex = 8;
+canvas.style.zIndex = 10;
 var ctx = canvas.getContext("2d");
 
 var divGameStage = document.getElementById("divGameStage");
@@ -22,26 +22,20 @@ divGameStage.appendChild(canvas);
 
 const win = {
     w: divGameStage.getBoundingClientRect().width,
-    h:600
+    h:divGameStage.getBoundingClientRect().height
 }
 console.log(win);
 const bgImage = new Image();
 const bugImage = new Image();
+
 // bug image
 var bugReady = false;
-
 const bugImgSrc = 'img/bug.png';
 bugImage.onload = function () {
     bugReady = true;
 };
-bugImage.src = bugImgSrc;
-var bug = {
-    x : Math.floor(20 + (Math.random() * (divGameStage.getBoundingClientRect().width - 100))),
-    y : Math.floor((Math.random() * (550)))
-};
-var fps = 5;
-var timer = 0;
 
+bugImage.src = bugImgSrc;
 
 /*--------------------
 Init
@@ -57,9 +51,16 @@ const init = () => {
 /*--------------------
 Preload Image
 --------------------*/
-const imgSrc = "img/macro3.jpg";
+const bgImgSrc = "img/macro3.jpg";
 bgImage.onload = init;
-bgImage.src = imgSrc;
+bgImage.src = bgImgSrc;
+
+var bug = {
+    x : Math.floor(20 + (Math.random() * (divGameStage.getBoundingClientRect().width - 100))),
+    y : Math.floor((Math.random() * (550)))
+};
+var fps = 5;
+var timer = 0;
 
 
 /*--------------------
@@ -72,7 +73,7 @@ const resize = () => {
     canvas.width = win.w;
     canvas.height = win.h;
     canvas.style.width = `${win.w - 20}px`;
-    canvas.style.height = `${win.h}px`;
+    canvas.style.height = `${win.h +10}px`;
    // requestAnimationFrame(render);
 }
 
@@ -103,8 +104,6 @@ window.addEventListener('resize', render);
 
 // Reset the game when the player smashes the bug
 var reset = function () {
-    // bug.x = canvas.width / 2;
-    // bug.y = canvas.height / 2;
     bug.x = Math.floor(20 + (Math.random() * (divGameStage.getBoundingClientRect().width - 100)));
     bug.y = Math.floor((Math.random() * (550)))
 
@@ -166,7 +165,6 @@ function isBugSmashed(bug, clickX, clickY) {
 
 //Reset Score box
 function resetScore() {
-    
     //console.log("Reset Score");
     scoreSpan.innerText = 0;
     bugSmashed = 0;
@@ -176,14 +174,14 @@ function resetScore() {
 
 //Reset speed box
 function resetSpeed() {
-    console.log("Reset Speed");
+   // console.log("Reset Speed");
     fps = 5;
     clearInterval(timer);
     timer = setInterval(reset, 30000 / fps);
     reset();
     return false;
 };
-console.log('Bug smashed: ', bugSmashed);
+// console.log('Bug smashed: ', bugSmashed);
 
 /*--------------------
 Cover Image
@@ -197,8 +195,7 @@ const coverImg = (bgImage, type = 'cover') => {
     }
     if ((imgRatio > winRatio && type === 'contain') || (imgRatio < winRatio && type === 'cover')) {
         const w = window.innerWidth * winRatio / imgRatio;
-        ctx.drawImage(bgImage, 0, 0, divGameStage.getBoundingClientRect().width, 600);
+        ctx.drawImage(bgImage, 0, 0, divGameStage.getBoundingClientRect().width, divGameStage.getBoundingClientRect().height);
 
-       // ctx.drawImage(bgImage, (win.w - w) / 2, 0, w, window.innerHeight);
     }
 }

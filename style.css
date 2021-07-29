@@ -233,7 +233,7 @@ span.score {
     width: 80%;
     text-align: center;
     margin:auto; 
-    height: 620px;
+    min-height: 620px;
 }
 
 .section-tittle {
@@ -280,7 +280,7 @@ span.score {
 @media screen and (max-width: 900px) {
     .section-gray {
         width: 100%;
-        max-height: 620px;
+        height: 620px;
     }
     .main-services {
         width: 100%;
